@@ -1,57 +1,60 @@
+importPackage(org.jsoup);
+importPackage(org.jsoup.nodes);
+
 const scriptName="ㅎㅈㄴ.js";
-const MEMBER_FILENAME = "MemberList";
-const slash = '/';
-const Command_List = [{Sale_info:"ㅎㅇ"},];
-let member_List = new Array();
+const MANAGER = "허재녕"
+const SLASH = '/';
+const Command_List = {save:"저장"};
+const folder_Root = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/katalkbot/lib/hjnchatbot/";
+let privacy_List = [];
+let privacy_member = {name:"홍길동",location:"삼방동",alarm:{hour:07,minute:00}};
 
-importPackage(org.jsoup)
-importPackage(org.jsoup.nodes)
-function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName, threadId){
-    if(room === "허재녕" || room === "김재윤")
+
+function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName, threadId)
+{
+    if(room==MANAGER)
     {
-        try
-        {
-            let memeber_Check = memeber_Checking(sender,replier);
-
-            if(memeber_Check===1)
-            {
-                replier.reply("ㅎㅇ!");
-
-            }
-            else
-            {
-                newMember(sender,replier);
-            }
-            
-            
-        }
-        catch(e)
-        {
-            replier.reply(e);
-        }
+        replier.reply(call_Privacy_By_File(sender,msg));
+        //replier.reply();
     }
-}
-function memeber_Checking(sender,replier){
-    for(var member of member_List)
-    {
-        if(member.name == sender)
-        {
-            return 1;
-                    
-        }
-    }
-    return 0;
     
-
 }
-function newMember(sender,replier){
-    let first_privacy= {name : "홍길동",location : "삼방동",todo_List : [],};
-    replier.reply("반갑습니다 "+sender+"님 사용자 등록을 시작하겠습니다");
-    first_privacy.name = sender;
-    member_List.push(first_privacy);
+function call_Privacy_By_File(member,order)
+{
+    var folder = new java.io.File(folder_Root);
+    folder.mkdirs();
+    var file = new java.io.File(folder_Root+member+".txt");
+    if (file.exists() == false){return "파일불러오기실패";}
+    try 
+     {
+        
+        var fis = new java.io.FileInputStream(file);
+        var isr = new java.io.InputStreamReader(fis);
+        var br = new java.io.BufferedReader(isr);
+        var temp_readline = "";
+        var temp_br = "";
+        while (true) 
+        {
+            if ((temp_readline = br.readLine()) === null) break;
+            temp_br += temp_readline + "\n";
+        }
+        temp_br = temp_br.slice(0, -1);
+        
+        fis.close();
+        isr.close();
+        br.close();
+        let privacy= temp_br.split("\n");
+        return privacy[order];
 
-
+    }
+    catch (e) 
+    {
+      return e;
+    }
+    
 }
+
+
 function onStartCompile(){
     
 }
