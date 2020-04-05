@@ -4,14 +4,14 @@ importPackage(org.jsoup.nodes);
 const scriptName="ㅎㅈㄴ.js";
 const MANAGER = "허재녕"
 const SLASH = '/';
-const Command_List = {save:"저장"};
 const folder_Root = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/katalkbot/lib/hjnchatbot/";
-const privacy_number = {name : 0,location : 1,alarm:2,subscribe_quasar:3,subscribe_coolen:4,toDoList:5};
+/*const privacy_number = {name : 0,location : 1,alarm:2,subscribe_quasar:3,subscribe_coolen:4,toDoList:5,};
 const privacy_set = ["홍길동","삼방동","07:00",true,true,[]];
-let privacy_member = {name:"홍길동",location:"삼방동",alarm:{hour:07,minute:00},subscribe_quasar:true,subscribe_coolen:true,toDoList:[],};
-let privacy_Newbi = ["홍길동","삼방동","07:00",true,true,[]];
+let privacy_member = {name:"홍길동",location:"삼방동",alarm:{hour:07,minute:00},subscribe_quasar:true,subscribe_coolen:true,toDoList:[],};&
+let privacy_Newbi = ["홍길동","삼방동","07:00",true,true,[]];*/
 let answer_Postive = ["y","Y","ㅇ","예","응","그래","맞아"];
 let answer_Nagative = ["n","N","ㄴ","아니","아니야","틀려"];
+let Login_Member = [];
 
 function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName, threadId)
 {
@@ -19,19 +19,9 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
     {
         if(room==MANAGER)
         {
-            if(member_Checking===1)
+            if(msg==="ㅎㅇ")
             {
-                decision_Answer(replier,sender,msg);
-
-            }
-            else
-            {
-                replier.reply("등록되지않은 사용자입니다 사용자등록을 시작합니다 Y/N")
-                {
-                    decision_Answer(replier,sender,msg);
-
-                }
-
+                member_Checking(replier,sender,msg);
             }
         }
         else
@@ -55,11 +45,11 @@ function member_Just_Checkint(sender)
         var member_File = new java.io.File(file_Root);
         if (member_File.exists() == true)
         {
-            return 1;
+            return 0;
         }
         else
         {
-            return 0;
+            return 1;
         }
     }
     catch(e)
@@ -70,17 +60,27 @@ function member_Just_Checkint(sender)
 }
 function member_Checking(replier,sender,msg)
 {
+    let file_Root = folder_Root+sender+".txt";
+    var member_File = new java.io.File(file_Root);
     try
     {
-        if (member_Just_Checkint===1)
+        if (member_Just_Checkint(sender)===0)
         {
-            replier.reply(`반갑습니다 ${sender}님 회원 정보를 불러오겠습니다`);
+            replier.reply("반갑습니다 " +sender "님 회원 정보를 불러오겠습니다");
         }
         else
         {
-            replier.reply(`반갑습니다 ${sender}님 신규 사용자 등록을 시작하겠습니다`);
-            member_File.createNewFile();
-            new_Member_Maker(replier,sender,msg,privacy_Newbi);
+            replier.reply("반갑습니다 "+sender+ "님 신규 사용자 등록을 시작하시겠습니까");
+            if(decision_Answer(replier,msg)===0)
+            {
+                member_File.createNewFile();
+                //new_Member_Maker(replier,sender,msg,privacy_Newbi);
+                
+            }
+            else if(decision_Answer(replier,msg)===1)
+            {
+                replier.reply("종료하겠습니다 안녕히 가십시오");
+            }
         }
     }
     catch(e)
@@ -95,10 +95,7 @@ function new_Member_Maker(replier,sender,msg,privacy_Newbi)
 
 
 }
-function privacy_Set_Name(privacy,)
-{
 
-}
 function call_Privacy_By_File(member)
 {
     var folder = new java.io.File(folder_Root);
@@ -133,34 +130,45 @@ function call_Privacy_By_File(member)
     }
     
 }
-function decision_Answer(replier,sender,msg)
+function decision_Answer(replier,msg)
 {
-    if(msg.indexOf(answer_Postive))
-    {
-        return 1;
-    }
-    else if(msg.indexOf(answer_Nagative))
+    string_Answer_Positive = return_Array_By_String(answer_Positive);
+    string_Answer_Nagative = return_Array_By_String(answer_Nagative);
+    if(check_word(msg, answer_Positive) == true)
     {
         return 0;
     }
+    else if(check_word(msg, answer_Nagative) == true)
+    {
+        return 1;
+    }
     else
     {
-        replier.reply(`방금하신 부분은 긍정입니까 아닙니까?의도를 파악할수없습니다\n긍정문은 ${return_Array_By_String(answer_Nagative)}로\n부정문은 ${return_Array_By_String(answer_Nagative)}로 대답해주십시오`);
-        function decision_Answer(replier,sender,msg);
+        replier.reply("방금하신 대답의 의도를 파악할수없습니다\n긍정문은 "+string_Answer_Positive+"로\n부정문은 "+string_Answer_Nagative+"\n으로 대답해주십시오");
+        replier.reply("다시한번 명령어를 실행시켜 주세요");
+        return 2;
     }
-
+}
+function check_word(msg, word_list){
+    for(var word of word_list){
+        if(msg.indexOf(word) !== -1) return true;
+    }
+    return false;
 }
 function return_Array_By_String(array)
 {
     string_To_Return = "";
-    for(let s of array)
+    for(let i = 0;i<array.length;i++)
     {
-        string_To_Return+s+", "
+        string_To_Return += array[i];
+        if(i<array.length-1)
+        {
+            string_To_Return += " , "
+
+        }
     }
-    string_To_Return = string_To_Return.slice(0,2);
     return string_To_Return;
 }
-
 function onStartCompile(){
     
 }

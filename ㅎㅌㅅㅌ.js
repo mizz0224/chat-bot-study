@@ -15,9 +15,9 @@ function response(room, msg, sender, isGroupChat, replier, ImageDB, packageName,
 {
     try
     {
-        if(room==MANAGER)
+        if(room==MANAGER||msg === "ㅌ")
         {
-            replier.reply(decision_smart(decision_Answer_Final(replier,sender,msg)));
+            replier.reply(decision_smart(decision_Answer(replier,sender,msg)));
         }
     }
     catch(e)
@@ -46,26 +46,16 @@ function decision_Answer(replier,sender,msg)
     string_Answer_Nagative = return_Array_By_String(answer_Nagative);
     if(check_word(msg, answer_Positive) == true)
     {
-        return 1;
+        answer_flag = true;
     }
     else if(check_word(msg, answer_Nagative) == true)
     {
-        return 0;
+        answer_flag = true;
     }
     else
     {
         replier.reply("방금하신 부분은 긍정입니까 아닙니까?의도를 파악할수없습니다\n긍정문은 "+string_Answer_Positive+"로\n부정문은 "+string_Answer_Nagative+"\n으로 대답해주십시오");
-        return 2;
     }
-}
-function decision_Answer_Final(replier,sender,msg)
-{
-    let status=2;
-    while(status!==2)
-    {
-        status = decision_Answer(replier,sender,msg);
-    }
-
 }
 function check_word(msg, word_list){
     for(var word of word_list){
